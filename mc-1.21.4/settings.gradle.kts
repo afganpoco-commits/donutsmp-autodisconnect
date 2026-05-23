@@ -9,7 +9,7 @@ pluginManagement {
     }
     resolutionStrategy {
         eachPlugin {
-            if (requested.id.namespace == "net.fabricmc") {
+            if (requested.id.id == "fabric-loom") {
                 useModule("net.fabricmc:fabric-loom:${requested.version}")
             }
         }
