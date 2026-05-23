@@ -41,7 +41,7 @@ public class AutoReconnectModule extends Module {
                     DonutAddon.LOG.info("[DonutSMP] Y={} algilandi, cikiliyor...", (int) y);
                     targetServer = server.ip;
                     state = 1;
-                    mc.execute(() -> mc.disconnect());
+                    mc.execute(() -> mc.disconnect(new TitleScreen(), false));
                 }
             }
             case 1 -> {
