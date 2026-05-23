@@ -21,7 +21,7 @@ repositories {
 
 dependencies {
     minecraft(libs.minecraft)
-    mappings(loom.officialMojangMappings())
+    "mappings"(loom.officialMojangMappings())
     implementation(libs.fabric.loader)
     implementation(libs.meteor.client)
 }
