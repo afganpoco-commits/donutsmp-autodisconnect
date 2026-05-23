@@ -1,0 +1,108 @@
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+jobs:
+  # ─── MC 1.21.4 ───────────────────────────────────────────
+  build-1_21_4:
+    name: Build MC 1.21.4
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11'
+
+      - name: Build
+        run: gradle build -x test
+        working-directory: mc-1.21.4
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: donutsmp-autodisconnect-1.21.4
+          path: mc-1.21.4/build/libs/*.jar
+          if-no-files-found: error
+
+  # ─── MC 1.21.11 ──────────────────────────────────────────
+  build-1_21_11:
+    name: Build MC 1.21.11
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 25
+        uses: actions/setup-java@v4
+        with:
+          java-version: '25'
+          distribution: 'temurin'
+          check-latest: true
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.4.1'
+
+      - name: Build
+        run: gradle build -x test
+        working-directory: mc-1.21.11
+
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: donutsmp-autodisconnect-1.21.11
+          path: mc-1.21.11/build/libs/*.jar
+          if-no-files-found: error
+
+  # ─── Release (sadece tag'de) ──────────────────────────────
+  release:
+    name: Create Release
+    needs: [build-1_21_4, build-1_21_11]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/')
+    permissions:
+      contents: write
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            donutsmp-autodisconnect-1.21.4/*.jar
+            donutsmp-autodisconnect-1.21.11/*.jar
+          body: |
+            ## DonutSMP AutoReconnect — ${{ github.ref_name }}
+
+            DonutSMP sunucusunda Y 0 ile -5 arasına indiğinde otomatik olarak çıkıp yeniden bağlanan Meteor Client addon'u.
+
+            ### Kurulum
+            1. [Meteor Client](https://meteorclient.com)'ı indir ve kur
+            2. Aşağıdan MC sürümüne uygun JAR'ı indir
+            3. JAR dosyasını `.minecraft/mods/` klasörüne kopyala
+            4. Minecraft'ı aç
+
+            ### Kullanım
+            - Oyuna gir → **Right Shift** ile Meteor menüsünü aç
+            - **Modules** → **DonutSMP** → `donut-auto-reconnect` modülünü aktif et
+            - DonutSMP'ye bağlan — Y 0 ile -5 arasına inince otomatik çıkıp bağlanacak
+
+            ### İndirme
+
+            | Dosya | Minecraft Sürümü |
+            |-------|-----------------|
+            | `donutsmp-autodisconnect-1.21.4-*.jar` | **MC 1.21.4** |
+            | `donutsmp-autodisconnect-1.21.11-*.jar` | **MC 1.21.11** |
