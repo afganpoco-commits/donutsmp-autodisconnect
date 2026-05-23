@@ -22,8 +22,8 @@ repositories {
 dependencies {
     minecraft(libs.minecraft)
     "mappings"(variantOf(libs.yarn) { classifier("v2") })
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.meteor.client) { isTransitive = false }
+    implementation(libs.fabric.loader)
+    implementation(libs.meteor.client)
 }
 
 java {
