@@ -30,14 +30,11 @@ public class AutoReconnectModule extends Module {
     @EventHandler
     private void onTick(TickEvent.Post event) {
         switch (state) {
-            // --- Durum 0: Sunucu ve Y konumunu izle ---
             case 0 -> {
                 if (mc.player == null || mc.getNetworkHandler() == null) return;
 
                 var server = mc.getCurrentServerEntry();
                 if (server == null) return;
-
-                // Sadece DonutSMP sunucusunda calis
                 if (!server.address.toLowerCase().contains("donutsmp")) return;
 
                 double y = mc.player.getY();
@@ -45,24 +42,18 @@ public class AutoReconnectModule extends Module {
                     DonutAddon.LOG.info("[DonutSMP] Y={} algilandi, cikiliyor...", (int) y);
                     targetServer = server.address;
                     state = 1;
-                    mc.execute(mc::disconnect);
+                    mc.execute(() -> mc.disconnect());
                 }
             }
-
-            // --- Durum 1: Dünyanın kapanmasını bekle ---
             case 1 -> {
                 if (mc.world == null) {
-                    countdown = 60; // 3 saniye (20 tick/sn)
+                    countdown = 60;
                     state = 2;
                 }
             }
-
-            // --- Durum 2: Yeniden baglama sayaci ---
             case 2 -> {
                 if (--countdown <= 0) state = 3;
             }
-
-            // --- Durum 3: Yeniden baglan ---
             case 3 -> {
                 state = 0;
                 if (targetServer != null && mc.world == null) {
