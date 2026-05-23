@@ -7,6 +7,13 @@ pluginManagement {
         mavenCentral()
         gradlePluginPortal()
     }
+    resolutionStrategy {
+        eachPlugin {
+            if (requested.id.namespace == "net.fabricmc") {
+                useModule("net.fabricmc:fabric-loom:${requested.version}")
+            }
+        }
+    }
 }
 
 plugins {
