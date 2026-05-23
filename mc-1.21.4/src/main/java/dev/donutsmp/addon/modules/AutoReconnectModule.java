@@ -4,13 +4,13 @@ import dev.donutsmp.addon.DonutAddon;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.gui.screens.ConnectScreen;
-import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraft.client.multiplayer.ServerAddress;
-import net.minecraft.client.multiplayer.ServerData;
+import net.minecraft.client.gui.screen.TitleScreen;
+import net.minecraft.client.gui.screen.multiplayer.ConnectScreen;
+import net.minecraft.client.network.ServerAddress;
+import net.minecraft.client.network.ServerInfo;
 
 /**
- * DonutSMP AutoReconnect Module — MC 1.21.4 (Mojang mappings via Loom 1.16)
+ * DonutSMP AutoReconnect Module — MC 1.21.4 (Yarn mappings via Loom 1.9)
  *
  * Oyuncu DonutSMP sunucusunda Y 0 ile -5 arasina indiginde
  * otomatik olarak oyundan cikar ve 3 saniye icinde geri baglanir.
@@ -30,22 +30,22 @@ public class AutoReconnectModule extends Module {
     private void onTick(TickEvent.Post event) {
         switch (state) {
             case 0 -> {
-                if (mc.player == null || mc.getConnection() == null) return;
+                if (mc.player == null || mc.getNetworkHandler() == null) return;
 
-                var server = mc.getCurrentServer();
+                var server = mc.getCurrentServerEntry();
                 if (server == null) return;
-                if (!server.ip.toLowerCase().contains("donutsmp")) return;
+                if (!server.address.toLowerCase().contains("donutsmp")) return;
 
                 double y = mc.player.getY();
                 if (y >= -5.0 && y <= 0.0) {
                     DonutAddon.LOG.info("[DonutSMP] Y={} algilandi, cikiliyor...", (int) y);
-                    targetServer = server.ip;
+                    targetServer = server.address;
                     state = 1;
                     mc.execute(() -> mc.disconnect());
                 }
             }
             case 1 -> {
-                if (mc.level == null) {
+                if (mc.world == null) {
                     countdown = 60;
                     state = 2;
                 }
@@ -55,12 +55,12 @@ public class AutoReconnectModule extends Module {
             }
             case 3 -> {
                 state = 0;
-                if (targetServer != null && mc.level == null) {
+                if (targetServer != null && mc.world == null) {
                     String addr = targetServer;
                     targetServer = null;
                     DonutAddon.LOG.info("[DonutSMP] Yeniden baglaniliyor: {}", addr);
-                    ServerData serverData = new ServerData("DonutSMP", addr, ServerData.Type.OTHER);
-                    ConnectScreen.startConnecting(new TitleScreen(), mc, ServerAddress.parseString(addr), serverData, false, null);
+                    ServerInfo info = new ServerInfo("DonutSMP", addr, ServerInfo.ServerType.OTHER);
+                    ConnectScreen.connect(new TitleScreen(), mc, ServerAddress.parse(addr), info, false, null);
                 }
             }
         }
