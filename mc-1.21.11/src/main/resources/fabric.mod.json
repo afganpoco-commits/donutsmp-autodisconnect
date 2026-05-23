@@ -1,0 +1,35 @@
+{
+  "schemaVersion": 1,
+  "id": "donutsmp-addon",
+  "version": "${version}",
+  "name": "DonutSMP AutoReconnect",
+  "description": "DonutSMP'de Y 0 ile -5 arasina inince otomatik disconnect ve reconnect yapar.",
+  "authors": [
+    "afganpoco-commits"
+  ],
+  "contact": {
+    "sources": "https://github.com/afganpoco-commits/donutsmp-autodisconnect"
+  },
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "dev.donutsmp.addon.DonutAddon"
+    ]
+  },
+  "mixins": [
+    "donutsmp-addon.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "255,140,0",
+    "modmenu": {
+      "parent": {
+        "id": "meteor-client"
+      }
+    }
+  },
+  "depends": {
+    "java": ">=${jdk_version}",
+    "minecraft": "${minecraft_version}",
+    "meteor-client": "*"
+  }
+}
